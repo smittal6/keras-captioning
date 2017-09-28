@@ -6,7 +6,13 @@ import numpy as np
 from keras.models import Model, Sequential
 from keras.layers import Input, BatchNormalization
 from keras.layers.core import Dense, Activation
-from keras.layers.recurrent import LSTM
+from keras.layers.recurrent import LSTM,GRU
+from keras.layers.embeddings import Embedding
+from keras.layers.wrappers import TimeDistributed
+'''
+We need to have a dictionary storing following stuff:
+    batch_size, max_caption_length, vocab_size, embedding_dim
+'''
 
 def model_image(input_tensor,mtype='vgg'):
     '''
@@ -29,7 +35,35 @@ def model_image(input_tensor,mtype='vgg'):
     # Not including the top layer as it is tuned for class pred, and output of convolution layers is average pooled
     base_model=cnn_model(weights='imagenet',input_tensor=input_tensor,include_top=False,pooling='avg')
 
+    # Freeze the training of layers
+    for layer in base_model.layers:
+        layer.trainable = False
+
+    return base_model
+
+def model_language():
+
+    #Temp definitions for testing:
+    vocab_size=500
+    max_caption_length=100 # 'Time Samples'
+    embedding_dim=128 #Each vector will be represented by these many dimensions
+
+    base_lang=Sequential()
+    # add Embedding layer,
+    base_lang.add(Embedding(vocab_size,embedding_dim,input_length=max_caption_length))
+    base_lang.add(GRU(embedding_dim,return_sequences=True))
+    base_lang.add(TimeDistributed(Dense(embedding_dim)))
+    # Add Time Distributed Layer, which will help in many-to-many task
+    base_lang.summary()
+
+    # return base_lang #When the time is right, we'll return
+
+def main_model():
+    '''
+    Will concatenate the two models. And do stuff.
+    '''
+
+
 # Just put for testing
-model_image(Input(shape=(224,224,3)),'inception')
-
-
+# model_image(Input(shape=(224,224,3)),'inception')
+model_language()
