@@ -1,0 +1,12 @@
+# This is for Show and Tell model.
+
+## There are two models:
+* CNN Model
+- Is used for getting the representation of images
+* Embedding
+- We need to obtain embeddding of words. One-hot? Word2Vec? Other Embedding?
+* Language Model
+- Relating image embedding and language model
+
+## References:
+https://keras.io/applications/
