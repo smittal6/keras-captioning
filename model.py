@@ -11,8 +11,15 @@ from keras.layers.embeddings import Embedding
 from keras.layers.wrappers import TimeDistributed
 '''
 We need to have a dictionary storing following stuff:
-    batch_size, max_caption_length, vocab_size, embedding_dim
+    input_shape,batch_size, max_caption_length, vocab_size, embedding_dim
 '''
+
+#Temp definitions for testing:
+vocab_size=500
+max_caption_length=100 # 'Time Samples'/Time step
+embedding_dim=256 # Each vector will be represented by these many dimensions
+recur_output_dim=128 # Dimensionality of output space of GRU
+input_shape=(200,200,3)
 
 def model_image(input_tensor,mtype='vgg'):
     '''
@@ -39,31 +46,43 @@ def model_image(input_tensor,mtype='vgg'):
     for layer in base_model.layers:
         layer.trainable = False
 
-    return base_model
+    # Give the summary of image model
+    output=Dense(embedding_dim*2,activation='relu')(base_model.output)
+    output=Dense(embedding_dim,activation='relu')(output)
+
+    model=Model(inputs=base_model.input,outputs=output)
+    model.summary()
+
+    return model
 
 def model_language():
 
-    #Temp definitions for testing:
-    vocab_size=500
-    max_caption_length=100 # 'Time Samples'
-    embedding_dim=128 #Each vector will be represented by these many dimensions
 
     base_lang=Sequential()
-    # add Embedding layer,
+    # add Embedding layer
     base_lang.add(Embedding(vocab_size,embedding_dim,input_length=max_caption_length))
-    base_lang.add(GRU(embedding_dim,return_sequences=True))
-    base_lang.add(TimeDistributed(Dense(embedding_dim)))
-    # Add Time Distributed Layer, which will help in many-to-many task
-    base_lang.summary()
 
-    # return base_lang #When the time is right, we'll return
+    # The output of the GRU layer is: [Batch_Size, TimeSteps, Recur_Output_dim]
+    base_lang.add(GRU(recur_output_dim,return_sequences=True))
+
+    # Add Time Distributed Layer, which will help in many-to-many task
+    base_lang.add(TimeDistributed(Dense(embedding_dim)))
+    # The output of the Time Distributed layer is: [Batch_Size, TimeSteps, embedding_dim]
+
+    # base_lang.summary()
+
+    return base_lang #When the time is right, we'll return
 
 def main_model():
     '''
     Will concatenate the two models. And do stuff.
     '''
+    im_model = model_image(Input(shape=input_shape))
+    lg_model = model_language()
+
+
 
 
 # Just put for testing
-# model_image(Input(shape=(224,224,3)),'inception')
-model_language()
+model_image(Input(shape=input_shape),'inception')
+# model_language()
