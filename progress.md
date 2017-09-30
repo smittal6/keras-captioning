@@ -27,5 +27,9 @@
   return_sequence=True. For this, we would have to make changes in the data
   processing step.
 
+## To do:
+- Implement Beam Search
+- Adding data generator
+
 ## References:
 https://keras.io/applications/
