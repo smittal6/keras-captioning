@@ -55,18 +55,12 @@ def image_embedding(input_tensor,mtype='inception'):
     for layer in base_model.layers:
         layer.trainable = False
 
-    # Will phase this out to Image model, which will take these embeddings and get them into the word dimension space
-    # output=Dense(embedding_dim*2,activation='relu')(base_model.output)
-    # output=Dense(embedding_dim,activation='relu')(output)
-
-    # Give the summary of image model
-    # model.summary()
-
-
 
 def main_model():
     '''
-    Will concatenate the two models. And do stuff.
+    Takes the input as *image embedding* and vector like output form described below.
+    Gives the output probabilities of various words from the vocab, given the image and previous words.
+    Doesn't seem to be appropriate for testing, as we need to sample there.
     '''
     #The trainable image model. Takes the image embedding as input
     im_model = Sequential()
@@ -98,12 +92,25 @@ def main_model():
     lg_model.add(TimeDistributed(Dense(embedding_dim)))
     # lg_model.summary()
 
-    # Concatenates the image and sentence embedding
+    # Concatenates the image and sentence embedding, As another option, maybe we could simply add them and see the effect?
     merged_input = keras.layers.concatenate([im_model.output,lg_model.output],axis=-1)
-    lstm_output = LSTM(1000)(merged_input)
+    '''
+    We have a choice now. return_sequences=True will give the progress of LSTM states, ie complete sequence.
+    Applying Dense/TimeDistributedDense will lead to max_caption_length X vocab_size matrix, each row mapping the existence of a word
+    Therefore, our output(the next words) that we feed should also be of the same format.
+    The other option, take the final LSTM state, let it encode the information for the sentence.
+    Map it with Dense Layer such that we have a vector of vocab_size, with 1's at places which have been marked as 'next words'
+    For now, continuing with second option.
+    Output form: 0 0 0 0 1 0 0 0 1 0 0 0 1 ..., 1 at ith place indicating presence of i^th word.
+    '''
+    lstm_output = LSTM(1000,return_sequences=False)(merged_input)
     output = Dense(vocab_size,activation='softmax')(lstm_output)
     model=Model(inputs=[im_model.input,lg_model.input],outputs=output)
-    model.summary()
+
+    #Plot the model
+    plot_model(model,'try1.png',show_shapes=True)
+
+    # model.summary()
 
 
 # Just put for testing
