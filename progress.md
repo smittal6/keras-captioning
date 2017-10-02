@@ -4,16 +4,16 @@
   add Show, Attend and Tell soon.
 
 ## Here is the workflow:
-### CNN Embedding
+### CNN Embedding{embed_image.py}
 - {VGG16, ResNet50, InceptionV3} can be used for getting image embeddings.
 
 ### Word Embedding
 - We need to obtain embeddding of words. 
   One-hot? Word2Vec? Other Embedding?
   Currently, not using any pretrained embedding. Let the model learn it.
-  Could take
+  Could take a lot of time
 
-### Language Model
+### Language Model{model.py}
 - Relating image embedding and language model. Currently, concatenating the
   vector embeddings, and let the LSTM output the final representation.
 
@@ -30,6 +30,8 @@
 ## To do:
 - Implement Beam Search
 - Adding data generator
+- Evaluation Step
+- Mapping Captions to Vectors
 
 ## References:
 https://keras.io/applications/
