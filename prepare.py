@@ -10,14 +10,17 @@ from keras.backend.tensorflow_backend import set_session
 counter = 0
 
 def load_image(path):
-    x = preprocess_input(np.expand_dims(image.img_to_array(image.load_img(path, target_size=(224,224))), axis=0))
-    return np.asarray(x)
+        x = preprocess_input(np.expand_dims(image.img_to_array(image.load_img(path, target_size=(224,224))), axis=0))
+        return np.asarray(x)
 
 def get_model():
 	model = VGG16(weights='imagenet', include_top=True, input_shape = (224, 224, 3))
 	model.layers.pop()
-	model.outputs = [model.layers[-1].output]
+        model.layers.pop()
+        # model.summary()
+	model.outputs = [model.layers[-2].output]
 	model.layers[-1].outbound_nodes = []
+	model.layers[-2].outbound_nodes = []
 	return model
 
 def get_encoding(model, img):
@@ -38,6 +41,6 @@ def prepare_dataset():
 			img = line[0:line.index('#')]
 			encoded_images[img] = get_encoding(encoding_model, img)
 	with open("encoded_images.p", "wb") as pickle_f:
-		pickle.dump( encoded_images, pickle_f )  
-
+		pickle.dump( encoded_images, pickle_f )
+# get_model()
 prepare_dataset()
