@@ -16,19 +16,34 @@ MAX_SEQUENCE_LENGTH = 50
 MAX_NB_WORDS = 20000
 D = '/Flickr8k_text/flickr_8k_train_dataset.txt'
 
-def getVec(text,model):
+def getVec (text, model):
     sequence=[item for sublist in tokenizer.texts_to_sequences(text) for item in sublist]
     b=np.pad(sequence, (0,EMBEDDING_DIM - len(sequence)%EMBEDDING_DIM), 'constant')
     return model.predict(np.reshape(b,(1,b.shape[0])))
 
-def sample (path, batch_size):
+def getHotVec (text, word_index):
+	x = np.zeros(MAX_NB_WORDS)
+	words = text.split()
+	for word in words:
+		if (word in word_index):
+			x[word_index[word]] = 1
+	return x
+
+def sample (path, batch_size, model, word_index):
+	img_list = []
+	p1_embed_list = []
+	p2_list = []
 	with open(os.getcwd()+path) as f:
 		lines = random.sample(f.readlines(),batch_size)
 	for i,line in enumerate(lines):
 		lines[i] = lines[i].replace("\n","")
-		cap = lines[i].split("\t")
-		print cap[1]
-	return lines
+		L = lines[i].split("\t")
+		img_list.append(L[0])
+		cap = L[1].split()
+		ind = random.randint(1,len(cap)-1)
+		p1_embed_list.append(getVec(' '.join(cap[:ind]),model))
+		p2_list.append(getHotVec(' '.join(cap[ind:]),word_index))
+	return zip(img_list,p1_embed_list,p2_list)
 
 texts = []
 with open(os.getcwd()+'/Flickr8k_text/Flickr8k.token.txt') as inf:
@@ -60,9 +75,6 @@ embedding_layer = Embedding(len(word_index) + 1, EMBEDDING_DIM, weights=[embeddi
 model = Sequential()
 model.add(embedding_layer)
 
-s = 'A girl going into a wooden building .'
-print getVec(s, model)
-print 'aa', embeddings_index['.']
-print 'bb', word_index['.']
+S = sample(D,2,model,word_index)
 
-print sample(D,2)
+print S
