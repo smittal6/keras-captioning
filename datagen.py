@@ -4,6 +4,7 @@ import numpy as np
 import cPickle as pickle
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
+from keras.models import Model, Sequential
 from keras.layers import Embedding
 from keras.models import load_model
 
@@ -11,7 +12,7 @@ GLOVE_DIR = os.getcwd()+'/GLOVE/'
 EMBEDDING_DIM = 50
 MAX_SEQUENCE_LENGTH = 50
 MAX_NB_WORDS = 20000
-PATH_TRAIN = ''
+PATH_TRAIN = '/Flickr8k_text/flickr_8k_train_dataset.txt'
 
 class dataFeeder():
     '''
