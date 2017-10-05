@@ -11,18 +11,19 @@ from keras.layers.recurrent import LSTM,GRU
 from keras.layers.embeddings import Embedding
 from keras.layers.wrappers import TimeDistributed
 from keras.utils import plot_model
+from datagen import dataFeeder
 '''
 We need to have a dictionary storing following stuff:
     input_shape,batch_size, max_caption_length, vocab_size, embedding_dim
 '''
 
 #Temp definitions for testing: 
-vocab_size=500
-max_caption_length=100 # 'Time Samples'/Time step
-embedding_dim=256 # Each vector will be represented by these many dimensions
-recur_output_dim=128 # Dimensionality of output space of GRU
-input_shape=(200,200,3)
-image_embedding_size=4096
+vocab_size = 20000
+max_caption_length = 50 # 'Time Samples'/Time step
+embedding_dim = 50 # Each vector will be represented by these many dimensions
+recur_output_dim = 100 # Dimensionality of output space of GRU
+input_shape = (224,224,3)
+image_embedding_size = 4096
 
 class main_model():
     def __init__  (self):
@@ -39,9 +40,10 @@ class main_model():
         # print im_model.input.shape
         # im_model.summary()
 
-        lg_model = Sequential()
+        dF = dataFeeder(picklefile='encoded_images.p')
+        lg_model = dF.model
         # add Embedding layer
-        lg_model.add(Embedding(vocab_size, embedding_dim, input_length=max_caption_length))
+        # lg_model.add(Embedding(vocab_size, embedding_dim, input_length=max_caption_length))
 
         # The output of the GRU layer is: [Batch_Size, TimeSteps, Recur_Output_dim]
         lg_model.add(GRU(recur_output_dim,return_sequences=True))
@@ -70,6 +72,9 @@ class main_model():
         model = Model(inputs=[im_model.input,lg_model.input],outputs=output)
 
         self.model = model
+
+        model.fit_generator(dF.sample())
+
         #Plot the model
         # plot_model(model,'try1.png',show_shapes=True)
 
