@@ -1,65 +1,111 @@
 import os
-import sys
+import time
 import numpy as np
-import cv2
-from keras.layers import Input
-from embed_image import image_module
+import cPickle as pickle
+from keras.preprocessing.text import Tokenizer
+from keras.preprocessing.sequence import pad_sequences
+from keras.models import Model, Sequential
+from keras.layers import Embedding
+from keras.models import load_model
 
-class DataGen():
+GLOVE_DIR = os.getcwd()+'/GLOVE/'
+EMBEDDING_DIM = 50
+MAX_SEQUENCE_LENGTH = 50
+MAX_NB_WORDS = 20000
+PATH_TRAIN = '/Flickr8k_text/flickr_8k_train_dataset.txt'
 
-    def __init__(self,img_list_path,cap_list_path,batch_size = 32):
-        '''
-        Initializes the data module, gives the image embeddings and the word input in required form
-        '''
-        self.batch_size = batch_size
-        # self.local_list=load(self.list_path,'r').split() #Not sure about splitting.
-        self.img_list = load(img_list_path,'r')
-        self.cap_list = load(cap_list_path'r')
-        # one to one mapping b/w img_list_path, cap_list_path
-        self.embedder = image_module()
+class dataFeeder():
+    '''
+    Returns the embedding for the given sentence
+    '''
+    def __init__(self,picklefile,modelfile=None):
+        texts = []
+        with open(os.getcwd()+'/Flickr8k_text/Flickr8k.token.txt') as inf:
+            for line in inf:
+                texts.append(line[line.index('#')+3:-2])
+            print 'Found %s texts.' % len(texts)
 
-    def feedData(self):
-        '''
-        #This is the generator
-        Given the list of image file names, gets them, converts to embedding.
-        For the captions: convert them to unique index numbering(through call to a different function)
-        marks the relevant positions with 1, leaves others as zero, in the vocab_length vector
-        '''
-        images, captions = sampleData()
-        # images are numpy now, captions is a list. Both have same length
-        image_embeddings = []
-        for image in images:
-            temp=self.embedder.model.predict(image)
-            image_embeddings.append(temp)
-        image_embeddings = np.asarray(image_embeddings)
+        tokenizer = Tokenizer(num_words=MAX_NB_WORDS)
+        tokenizer.fit_on_texts(texts)
+        sequences = tokenizer.texts_to_sequences(texts)
+        word_index = tokenizer.word_index
+        data = pad_sequences(sequences, maxlen=MAX_SEQUENCE_LENGTH)
 
-    def sampleData(self):
-        '''
-        From the list of images, sample few according to batch size.
-        Return the corresponding captions for each image
-        So the captions list will be like this:
-            captions[i] contains m number of captions for i^th image
-        '''
-        indexes = sampleIndex()
-        image_list = self.img_list[indexes]
-        caption_list = self.cap_list[indexes]
-        for img_path in image_list:
-            img = load_image(img_path)
-            images.append(img)
-        images = np.asarray(images)
-        #Get the captions here[Captions is a list]
-        return images, captions
+        print 'Found %s unique tokens.' % len(word_index)
+        print 'Shape of data tensor:', data.shape
 
-    def sampleIndex(self):
-        '''
-        For sampling the indexes. Will be used by sampleData.
-        The total length of indexes will be batch size
-        '''
-        indexes = np.arange(len(self.local_list))
-        np.random.shuffle(indexes)
-        return indexes[0:self.batch_size]
+        embeddings_index = {}
+        f = open(os.path.join(GLOVE_DIR, 'glove.6B.50d.txt'))
+        for line in f:
+            values = line.split()
+            word = values[0]
+            coefs = np.asarray(values[1:], dtype='float32')
+            embeddings_index[word] = coefs
+        f.close()
+        # Obtained all the word embeddings. Fetch for word 'w', as embeddings_index[w]
 
-    def load_image(self,img_path):
-        img = cv2.imread(img_path)
-        # Do normalization if required
-        return img
+        # print 'Found %s word vectors.' % len(embeddings_index)
+
+        embedding_matrix = np.zeros((len(word_index) + 1, EMBEDDING_DIM))
+        for word, i in word_index.items():
+            embedding_vector = embeddings_index.get(word)
+            if embedding_vector is not None:
+                # words not found in embedding index will be all-zeros.
+                embedding_matrix[i] = embedding_vector
+        #Found the intersection of Glove, and Captions
+
+        # Initializing the class params like model, encoding_dict 
+        self.encoding=pickle.load(open(picklefile,'rb'))
+        self.word_index=word_index
+        self.embedding_matrix = embedding_matrix
+
+        if modelfile==None:
+            self.model = Sequential()
+            embedding_layer = Embedding(len(word_index) + 1,  EMBEDDING_DIM, weights=[embedding_matrix], input_length=MAX_SEQUENCE_LENGTH, trainable=False)
+            self.model.add(embedding_layer)
+        else:
+            self.model = load_model(modelfile);
+
+    def getVec(self,text):
+        '''
+        Returns the embedding for the sentence.
+        '''
+        sequence=[item for sublist in tokenizer.texts_to_sequences(text) for item in sublist]
+        b=np.pad(sequence, (0,EMBEDDING_DIM - len(sequence)%EMBEDDING_DIM), 'constant')
+        return b
+
+    def getHotVec(self,text):
+        '''
+        Returns the many hot vector as required by output
+        '''
+        x = np.zeros(MAX_NB_WORDS)
+        words = text.split()
+        for word in words:
+            if (word in self.word_index):
+            	x[self.word_index[word]] = 1
+        return x
+
+    def sample(self, batch_size = 32):
+        '''
+        Takes as input batch size
+        Sends: Encoded Image, Glove embedding (p1), ManyHotVec (p2)
+        '''
+        img_list = []
+        encode_list = []
+        p1_embed_list = []
+        p2_hot_list = []
+        with open(os.getcwd()+PATH_TRAIN) as f:
+                lines = random.sample(f.readlines(),batch_size)
+
+        for i,line in enumerate(lines):
+            lines[i] = lines[i].replace("\n","")
+            L = lines[i].split("\t")
+            img_list.append(L[0])
+            encode_list.append(self.encoding[L[0]])
+            cap = L[1].split()
+            ind = random.randint(1,len(cap)-1)
+            p1_embed_list.append(getVec(' '.join(cap[:ind])))
+            p2_hot_list.append(getHotVec(' '.join(cap[ind:])))
+    	
+        inputs=[np.asarray(encode_list),np.asarray(embed_list)]
+        yield (inputs, np.asarray(p2_hot_list))
