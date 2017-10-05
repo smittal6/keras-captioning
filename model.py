@@ -32,7 +32,7 @@ class main_model():
         # print im_model.input.shape
         # im_model.summary()
 
-        dF = dataFeeder(picklefile=params['PICKLE_FILE'])
+        dF = dataFeeder(params,picklefile=params['PICKLE_FILE'])
         lg_model = dF.model
         g = dF.sample()
         # add Embedding layer

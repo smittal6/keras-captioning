@@ -16,14 +16,14 @@ class dataFeeder():
         Returns the embedding for the sentence.
         '''
         sequence=[item for sublist in self.tokenizer.texts_to_sequences(text.split()) for item in sublist]
-        b = np.pad(sequence, (0,params['EMBEDDING_DIM'] - len(sequence)%params['EMBEDDING_DIM']), 'constant')
+        b = np.pad(sequence, (0,self.params['EMBEDDING_DIM'] - len(sequence)%self.params['EMBEDDING_DIM']), 'constant')
         return b
 
     def getHotVec(self,text):
         '''
         Returns the many hot vector as required by output
         '''
-        x = np.zeros(params['VOCAB_SIZE'])
+        x = np.zeros(self.params['VOCAB_SIZE'])
         words = text.split()
         for word in words:
             if (word in self.word_index):
@@ -40,7 +40,7 @@ class dataFeeder():
             encode_list = []
             p1_embed_list = []
             p2_hot_list = []
-            with open(params['PATH_TRAIN']) as f:
+            with open(self.params['PATH_TRAIN']) as f:
                     lines = random.sample(f.readlines(),batch_size)
 
             for i,line in enumerate(lines):
@@ -64,8 +64,6 @@ class dataFeeder():
                 texts.append(a[a.index('\t')+1:])
             print 'Found %s texts.' % len(texts)
 
-        print texts[0]
-
         tokenizer = Tokenizer(num_words = params['VOCAB_SIZE'])
         tokenizer.fit_on_texts(texts)
         sequences = tokenizer.texts_to_sequences(texts)
@@ -85,8 +83,6 @@ class dataFeeder():
         f.close()
         # Obtained all the word embeddings. Fetch for word 'w', as embeddings_index[w]
 
-        # print 'Found %s word vectors.' % len(embeddings_index)
-
         embedding_matrix = np.zeros((len(word_index) + 1, params['EMBEDDING_DIM']))
         for word, i in word_index.items():
             embedding_vector = embeddings_index.get(word)
@@ -99,6 +95,7 @@ class dataFeeder():
         self.encoding=pickle.load(open(picklefile,'rb'))
         self.word_index=word_index
         self.embedding_matrix = embedding_matrix
+        self.params = params
 
         if modelfile==None:
             self.model = Sequential()

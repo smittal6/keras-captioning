@@ -6,22 +6,22 @@ from keras.models import Sequential, load_model
 
 def train():
 	params={
-	'GLOVE_DIR':'',
+	'GLOVE_DIR':'/data/sidm/keras-captioning/files/GLOVE',
 	'EMBEDDING_DIM': 50,
 	'MAX_SEQUENCE_LENGTH': 50,
 	'VOCAB_SIZE':20000,
 	'RECUR_OUTPUT_DIM':100,
 	'IMAGE_ENCODING_SIZE':4096,
-	'PATH_TRAIN':''
-	'PICKLE_FILE': "encoded_image.p"
+	'PATH_TRAIN':'/data/sidm/keras-captioning/files/Flickr8k_text/flickr_8k_train_dataset.txt',
+	'PICKLE_FILE': "/data/sidm/keras-captioning/files/encoded_images.p",
 	'SPE':10,
 	'EPOCHS':15,
-	'SAVE_PATH':''
+	'SAVE_PATH':'/data/sidm/keras-captioning/models/'
 	}
 	
 	name='glove_gru_100recur_vgg.h5'
 	# Get the model from main_model
-	main=main_model()
+	main=main_model(params)
 	model=main.model
 
 	# Get the generator from dF
