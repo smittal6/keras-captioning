@@ -31,6 +31,9 @@ def prepare_dataset(no_imgs = -1):
 	for img in train_imgs:
 		for capt in data[img]:
 			caption = capt
+			if (caption[-1] != '.'):
+				caption += '.'
+			print caption[-1]
 			f_train_dataset.write(img+"\t"+caption+"\n")
 			f_train_dataset.flush()
 			c_train += 1
@@ -40,6 +43,9 @@ def prepare_dataset(no_imgs = -1):
 	for img in test_imgs:
 		for capt in data[img]:
 			caption = capt
+			if (caption[-1] != '.'):
+				caption += '.'
+			print caption[-1]
 			f_test_dataset.write(img+"\t"+caption+"\n")
 			f_test_dataset.flush()
 			c_test += 1
