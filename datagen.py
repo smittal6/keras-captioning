@@ -9,12 +9,6 @@ from keras.models import Model, Sequential
 from keras.layers import Embedding
 from keras.models import load_model
 
-GLOVE_DIR = '/GLOVE/'
-EMBEDDING_DIM = 50
-MAX_SEQUENCE_LENGTH = 50
-VOCAB_SIZE = 20000
-PATH_TRAIN = '/Flickr8k_text/flickr_8k_train_dataset.txt'
-
 class dataFeeder():
 
     def getVec(self,text):

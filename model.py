@@ -17,14 +17,6 @@ We need to have a dictionary storing following stuff:
     input_shape,batch_size, MAX_SEQUENCE_LENGTH, vocab_size, embedding_dim
 '''
 
-#Temp definitions for testing:
-EMBEDDING_DIM = 50
-VOCAB_SIZE = 20000
-MAX_SEQUENCE_LENGTH = 50
-RECUR_OUTPUT_DIM = 100
-IMAGE_ENCODING_SIZE = 4096
-PICKLE_FILE = 'encoded_images.p'
-
 class main_model():
     def __init__  (self, params):
         '''
