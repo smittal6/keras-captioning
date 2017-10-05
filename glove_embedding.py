@@ -80,8 +80,8 @@ class dataFeeder():
         x = np.zeros(MAX_NB_WORDS)
         words = text.split()
         for word in words:
-                if (word in self.word_index):
-                        x[self.word_index[word]] = 1
+            if (word in self.word_index):
+            	x[self.word_index[word]] = 1
         return x
 
     def sample(self, batch_size = 32):
@@ -89,7 +89,7 @@ class dataFeeder():
         Takes as input batch size
         Sends: Encoded Image, Glove embedding (p1), ManyHotVec (p2)
         '''
-	img_list = []
+        img_list = []
         encode_list = []
         p1_embed_list = []
         p2_hot_list = []
@@ -97,14 +97,13 @@ class dataFeeder():
                 lines = random.sample(f.readlines(),batch_size)
 
         for i,line in enumerate(lines):
-                lines[i] = lines[i].replace("\n","")
-                L = lines[i].split("\t")
-                img_list.append(L[0])
-                encode_list.append(self.encoding[L[0]])
-                cap = L[1].split()
-                ind = random.randint(1,len(cap)-1)
-                p1_embed_list.append(getVec(' '.join(cap[:ind]))
-                p2_hot_list.append(getHotVec(' '.join(cap[ind:])))
-        return zip(encode_list,p1_embed_list,p2_hot_list)
-
-
+            lines[i] = lines[i].replace("\n","")
+            L = lines[i].split("\t")
+            img_list.append(L[0])
+            encode_list.append(self.encoding[L[0]])
+            cap = L[1].split()
+            ind = random.randint(1,len(cap)-1)
+            p1_embed_list.append(getVec(' '.join(cap[:ind])))
+            p2_hot_list.append(getHotVec(' '.join(cap[ind:])))
+    	
+    	return zip(encode_list,p1_embed_list,p2_hot_list)
