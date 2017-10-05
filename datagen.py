@@ -72,7 +72,7 @@ class dataFeeder():
         '''
         sequence=[item for sublist in tokenizer.texts_to_sequences(text) for item in sublist]
         b=np.pad(sequence, (0,EMBEDDING_DIM - len(sequence)%EMBEDDING_DIM), 'constant')
-        return self.model.predict(np.reshape(b,(1,b.shape[0])))
+        return b
 
     def getHotVec(self,text):
         '''
@@ -107,4 +107,5 @@ class dataFeeder():
             p1_embed_list.append(getVec(' '.join(cap[:ind])))
             p2_hot_list.append(getHotVec(' '.join(cap[ind:])))
     	
-    	return zip(encode_list,p1_embed_list,p2_hot_list)
+        inputs=[np.asarray(encode_list),np.asarray(embed_list)]
+        yield (inputs, np.asarray(p2_hot_list))
