@@ -71,10 +71,11 @@ class main_model():
         output = Dense(vocab_size,activation='softmax')(lstm_output)
         model = Model(inputs=[im_model.input,lg_model.input],outputs=output)
 
+        g = dF.sample()
+        model.compile(optimizer = 'rmsprop', loss = 'categorical_crossentropy', metrics = ['accuracy'])
+        model.fit_generator(generator = g, steps_per_epoch = 10, verbose = 2, epochs = 10)
+
         self.model = model
-
-        model.fit_generator(dF.sample())
-
         #Plot the model
         # plot_model(model,'try1.png',show_shapes=True)
 
