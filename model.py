@@ -42,6 +42,7 @@ class main_model():
 
         dF = dataFeeder(picklefile='encoded_images.p')
         lg_model = dF.model
+        g = dF.sample()
         # add Embedding layer
         # lg_model.add(Embedding(vocab_size, embedding_dim, input_length=max_caption_length))
 
@@ -56,7 +57,7 @@ class main_model():
         lg_model.add(TimeDistributed(Dense(embedding_dim)))
         # lg_model.summary()
 
-        # Concatenates the image and sentence embedding, As another option, maybe we could simply add them and see the effect?
+        # Concatenates the image and sentence embedding
         merged_input = keras.layers.concatenate([im_model.output,lg_model.output],axis=-1)
         '''
         We have a choice now. return_sequences=True will give the progress of LSTM states, ie complete sequence.
@@ -70,15 +71,9 @@ class main_model():
         lstm_output = LSTM(1000,return_sequences=False)(merged_input)
         output = Dense(vocab_size,activation='softmax')(lstm_output)
         model = Model(inputs=[im_model.input,lg_model.input],outputs=output)
-
-        g = dF.sample()
-        model.compile(optimizer = 'rmsprop', loss = 'categorical_crossentropy', metrics = ['accuracy'])
-        model.fit_generator(generator = g, steps_per_epoch = 10, verbose = 2, epochs = 10)
-
         self.model = model
+        self.gen = g
+
         #Plot the model
         # plot_model(model,'try1.png',show_shapes=True)
 
-        # model.summary()
-
-ob = main_model()
