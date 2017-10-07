@@ -33,7 +33,7 @@ def prepare_dataset(no_imgs = -1):
 			caption = capt
 			if (caption[-1] != '.'):
 				caption += '.'
-			print caption[-1]
+			caption = '# ' + caption
 			f_train_dataset.flush()
 			c_train += 1
 	f_train_dataset.close()
@@ -44,7 +44,7 @@ def prepare_dataset(no_imgs = -1):
 			caption = capt
 			if (caption[-1] != '.'):
 				caption += '.'
-			print caption[-1]
+			caption = '# ' + caption
 			f_test_dataset.flush()
 			c_test += 1
 	f_test_dataset.close()
