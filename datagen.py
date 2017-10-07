@@ -64,7 +64,7 @@ class dataFeeder():
                 texts.append(a[a.index('\t')+1:])
             print 'Found %s texts.' % len(texts)
 
-        tokenizer = Tokenizer(num_words = params['VOCAB_SIZE'])
+        tokenizer = Tokenizer(num_words = params['VOCAB_SIZE'], filters='!"$%&()*+,-/:;<=>?@[\\]^_`{|}~\t\n')
         tokenizer.fit_on_texts(texts)
         sequences = tokenizer.texts_to_sequences(texts)
         word_index = tokenizer.word_index
