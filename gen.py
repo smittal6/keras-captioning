@@ -10,10 +10,10 @@ def prepare_dataset(no_imgs = -1):
 	f_test_images.close()
 
 	f_train_dataset = open(os.getcwd()+'/Flickr8k_text/flickr_8k_train_dataset.txt','wb')
-	f_train_dataset.write("image_id\tcaptions\n")
+	# f_train_dataset.write("image_id\tcaptions\n")
 
 	f_test_dataset = open(os.getcwd()+'/Flickr8k_text/flickr_8k_test_dataset.txt','wb')
-	f_test_dataset.write("image_id\tcaptions\n")
+	# f_test_dataset.write("image_id\tcaptions\n")
 
 	f_captions = open(os.getcwd()+'/Flickr8k_text/Flickr8k.token.txt', 'rb')
 	captions = f_captions.read().strip().split('\n')
@@ -32,8 +32,9 @@ def prepare_dataset(no_imgs = -1):
 		for capt in data[img]:
 			caption = capt
 			if (caption[-1] != '.'):
-				caption += '.'
+				caption += ' .'
 			caption = '# ' + caption
+			f_train_dataset.write(img + '\t' + caption + '\n')
 			f_train_dataset.flush()
 			c_train += 1
 	f_train_dataset.close()

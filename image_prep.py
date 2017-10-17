@@ -10,7 +10,7 @@ from keras.backend.tensorflow_backend import set_session
 counter = 0
 
 def load_image(path):
-    x = preprocess_input(np.expand_dims(image.img_to_array(image.load_img(path, target_size=(224,224))), axis=0))
+    x = preprocess_input(np.expand_dims(image.img_to_array(image.load_img(path, target_size=(224,224,3))), axis=0))
     return np.asarray(x)
 
 def get_model():
@@ -38,6 +38,6 @@ def prepare_dataset():
 			img = line[0:line.index('#')]
 			encoded_images[img] = get_encoding(encoding_model, img)
 	with open("encoded_images.p", "wb") as pickle_f:
-		pickle.dump( encoded_images, pickle_f )  
+		pickle.dump( encoded_images, pickle_f)  
 
 prepare_dataset()

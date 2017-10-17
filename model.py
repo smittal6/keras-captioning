@@ -14,7 +14,7 @@ from keras.utils import plot_model
 from datagen import dataFeeder
 '''
 We need to have a dictionary storing following stuff:
-    input_shape,batch_size, MAX_SEQUENCE_LENGTH, vocab_size, embedding_dim
+    input_shape,batch_size, MAX_SEQUENCE_LENGTH, vocab_size, embedding_dim, etc..
 '''
 
 class main_model():
@@ -51,7 +51,7 @@ class main_model():
 
         # Concatenates the image and sentence embedding
         merged_input = keras.layers.concatenate([im_model.output,lg_model.output],axis=-1)
-        '''
+        '''c
         We have a choice now. return_sequences=True will give the progress of LSTM states, ie complete sequence.
         Applying Dense/TimeDistributedDense will lead to MAX_SEQUENCE_LENGTH X vocab_size matrix, each row mapping the existence of a word
         Therefore, our output(the next words) that we feed should also be of the same format.
