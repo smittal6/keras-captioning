@@ -60,4 +60,11 @@ for i in range (1,k):
 	#	break
 print s
 
-
+emb = np.zeros(50)
+emb = np.reshape(emb,(1,emb.shape[0]))
+wordvec = model.predict([enc,emb]).flatten()
+top_k_ind = (-wordvec).argsort()[:k]
+print ''
+for i in range (0,k):
+	print rev_word_index[top_k_ind[i]],
+print ''

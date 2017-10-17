@@ -15,8 +15,8 @@ def train():
 	'IMAGE_ENCODING_SIZE': 4096,
 	'PATH_TRAIN': '/data/rohitkb/keras-captioning/files/Flickr8k_text/flickr_8k_train_dataset.txt',
 	'PICKLE_FILE': '/data/rohitkb/keras-captioning/files/encoded_images.p',
-	'SPE': 10,
-	'EPOCHS': 15,
+	'SPE': 20,
+	'EPOCHS': 25,
 	'BATCH_SIZE': 64,
 	'SAVE_PATH': '/data/rohitkb/keras-captioning/files/models/'
 	}
