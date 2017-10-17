@@ -28,7 +28,7 @@ def get_encoding(model, path):
 	return pred
 
 embeddings_index = {}
-f = open(os.getcwd()+'/GLOVE/glove.6B.50d.txt')
+f = open(os.getcwd()+'/files/GLOVE/glove.6B.50d.txt')
 for line in f:
     values = line.split()
     word = values[0]
@@ -43,15 +43,21 @@ word_index = pickle.load(open('word_pickle.p','rb'))
 rev_word_index = {v: k for k, v in word_index.iteritems()}
 
 emb = np.zeros(50)
-emb[0] = word_index['#']
 
-model = load_model(os.getcwd()+'/models/faltu.h5')
+model = load_model(os.getcwd()+'/files/models/testing.h5')
 enc = np.reshape(enc,(1,enc.shape[0]))
 emb = np.reshape(emb,(1,emb.shape[0]))
+emb[0][0] = word_index['#']
 
-wordvec = model.predict([enc,emb]).flatten()
-k = 25
-ind = np.argpartition(wordvec, -k)[-k:]
-for i in ind:
-	print rev_word_index[i],
-print ''
+k = 50
+s = ''
+for i in range (1,k):
+	wordvec = model.predict([enc,emb]).flatten()
+	max_ind = np.argmax(wordvec)
+	emb[0][i] = max_ind
+	s = s + rev_word_index[max_ind]
+	# if (rev_word_index[max_ind] == '.'):
+	#	break
+print s
+
+

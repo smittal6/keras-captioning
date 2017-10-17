@@ -1,21 +1,21 @@
 import os
 
 def prepare_dataset(no_imgs = -1):
-	f_train_images = open(os.getcwd()+'/Flickr8k_text/Flickr_8k.trainImages.txt','rb')
+	f_train_images = open(os.getcwd()+'/files/Flickr8k_text/Flickr_8k.trainImages.txt','rb')
 	train_imgs = f_train_images.read().strip().split('\n') if no_imgs == -1 else f_train_images.read().strip().split('\n')[:no_imgs]
 	f_train_images.close()
 
-	f_test_images = open(os.getcwd()+'/Flickr8k_text/Flickr_8k.testImages.txt','rb')
+	f_test_images = open(os.getcwd()+'/files/Flickr8k_text/Flickr_8k.testImages.txt','rb')
 	test_imgs = f_test_images.read().strip().split('\n') if no_imgs == -1 else f_test_images.read().strip().split('\n')[:no_imgs]
 	f_test_images.close()
 
-	f_train_dataset = open(os.getcwd()+'/Flickr8k_text/flickr_8k_train_dataset.txt','wb')
+	f_train_dataset = open(os.getcwd()+'/files/Flickr8k_text/flickr_8k_train_dataset.txt','wb')
 	# f_train_dataset.write("image_id\tcaptions\n")
 
-	f_test_dataset = open(os.getcwd()+'/Flickr8k_text/flickr_8k_test_dataset.txt','wb')
+	f_test_dataset = open(os.getcwd()+'/files/Flickr8k_text/flickr_8k_test_dataset.txt','wb')
 	# f_test_dataset.write("image_id\tcaptions\n")
 
-	f_captions = open(os.getcwd()+'/Flickr8k_text/Flickr8k.token.txt', 'rb')
+	f_captions = open(os.getcwd()+'/files/Flickr8k_text/Flickr8k.token.txt', 'rb')
 	captions = f_captions.read().strip().split('\n')
 	data = {}
 	for row in captions:

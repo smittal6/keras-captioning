@@ -7,21 +7,21 @@ from keras.models import Sequential, load_model
 
 def train():
 	params={
-	'GLOVE_DIR':'/home/rohitkb/Desktop/Coursework/CS771/Project/GLOVE',
+	'GLOVE_DIR': '/data/rohitkb/keras-captioning/files/GLOVE',
 	'EMBEDDING_DIM': 50,
 	'MAX_SEQUENCE_LENGTH': 50,
 	'VOCAB_SIZE': 5000,
-	'RECUR_OUTPUT_DIM':100,
-	'IMAGE_ENCODING_SIZE':4096,
-	'PATH_TRAIN':'/home/rohitkb/Desktop/Coursework/CS771/Project/Flickr8k_text/flickr_8k_train_dataset.txt',
-	'PICKLE_FILE': "/home/rohitkb/Desktop/Coursework/CS771/Project/encoded_images.p",
-	'SPE':10,
-	'EPOCHS':15,
-	'BATCH_SIZE':64,
-	'SAVE_PATH':'/home/rohitkb/Desktop/Coursework/CS771/Project/models/'
+	'RECUR_OUTPUT_DIM': 100,
+	'IMAGE_ENCODING_SIZE': 4096,
+	'PATH_TRAIN': '/data/rohitkb/keras-captioning/files/Flickr8k_text/flickr_8k_train_dataset.txt',
+	'PICKLE_FILE': '/data/rohitkb/keras-captioning/files/encoded_images.p',
+	'SPE': 10,
+	'EPOCHS': 15,
+	'BATCH_SIZE': 64,
+	'SAVE_PATH': '/data/rohitkb/keras-captioning/files/models/'
 	}
 	
-	name = 'faltu.h5'
+	name = 'testing.h5'
 
 	# Get the model from main_model
 	main = main_model(params)
