@@ -36,26 +36,33 @@ class dataFeeder():
 
     def sample(self):
         while 1:
-            img_list = []
-            encode_list = []
-            p1_embed_list = []
-            p2_hot_list = []
-            with open(self.params['PATH_TRAIN']) as f:
-                    lines = random.sample(f.readlines(),self.params['BATCH_SIZE'])
-
-            for i,line in enumerate(lines):
-                lines[i] = lines[i].replace("\n","")
-                L = lines[i].split("\t")
-                img_list.append(L[0])
-                encode_list.append(self.encoding[L[0]])
-                cap = L[1].split()
-                ind = random.randint(1,len(cap)-1)
-                p1_embed_list.append(self.getVec(' '.join(cap[:ind])))
-                p2_hot_list.append(self.getHotVec(' '.join(cap[ind:])))
-            
-            inputs = [np.asarray(encode_list),np.asarray(p1_embed_list)]
-            output = np.asarray(p2_hot_list)
-            yield (inputs, output)
+        	c = 0
+        	flag = True
+        	img_list = []
+        	encode_list = []
+        	p1_embed_list = []
+        	p2_hot_list = []
+        	with open(self.params['PATH_TRAIN']) as f:
+        		lines = random.sample(f.readlines(),self.params['BATCH_SIZE'])
+    		for i,line in enumerate(lines):
+    			lines[i] = lines[i].replace("\n","")
+    			L = lines[i].split("\t")
+                	img_list.append(L[0])
+                	cap = L[1].split()
+                	ind = random.randint(1,len(cap)-1)
+                	while (ind <= len(cap) - 1):
+                		p1_embed_list.append(self.getVec(' '.join(cap[:ind])))
+                		p2_hot_list.append(self.getHotVec(' '.join(cap[ind:])))
+                		encode_list.append(self.encoding[L[0]])
+                		ind = ind + 1
+                		c = c + 1;
+                		if (c == self.params['BATCH_SIZE']):
+                			flag = False; break;
+                	if (flag == False):
+                    		break;
+        	inputs = [np.asarray(encode_list),np.asarray(p1_embed_list)]
+        	output = np.asarray(p2_hot_list)
+    		yield (inputs, output)
 
     def __init__(self, params, picklefile, modelfile=None):
         texts = []
@@ -108,3 +115,4 @@ class dataFeeder():
             self.model.add(embedding_layer)
         else:
             self.model = load_model(modelfile);
+
