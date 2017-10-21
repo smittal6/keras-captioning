@@ -7,18 +7,18 @@ from keras.models import Sequential, load_model
 
 def train():
 	params={
-	'GLOVE_DIR': '/data/rohitkb/keras-captioning/files/GLOVE',
+	'GLOVE_DIR': '/data/'+str(sys.argv[1])+'/keras-captioning/files/GLOVE',
 	'EMBEDDING_DIM': 50,
 	'MAX_SEQUENCE_LENGTH': 50,
 	'VOCAB_SIZE': 5000,
 	'RECUR_OUTPUT_DIM': 100,
 	'IMAGE_ENCODING_SIZE': 4096,
-	'PATH_TRAIN': '/data/rohitkb/keras-captioning/files/Flickr8k_text/flickr_8k_train_dataset.txt',
-	'PICKLE_FILE': '/data/rohitkb/keras-captioning/files/encoded_images.p',
+	'PATH_TRAIN': '/data/'+str(sys.argv[1])+'/keras-captioning/files/Flickr8k_text/flickr_8k_train_dataset.txt',
+	'PICKLE_FILE': '/data/'+str(sys.argv[1])+'/keras-captioning/files/encoded_images.p',
 	'SPE': 20,
 	'EPOCHS': 25,
 	'BATCH_SIZE': 64,
-	'SAVE_PATH': '/data/rohitkb/keras-captioning/files/models/'
+	'SAVE_PATH': '/data/'+str(sys.argv[1])+'/keras-captioning/files/models/'
 	}
 	
 	name = 'testing.h5'
