@@ -49,22 +49,8 @@ enc = np.reshape(enc,(1,enc.shape[0]))
 emb = np.reshape(emb,(1,emb.shape[0]))
 emb[0][0] = word_index['#']
 
-k = 50
-s = ''
-for i in range (1,k):
-	wordvec = model.predict([enc,emb]).flatten()
-	max_ind = np.argmax(wordvec)
-	emb[0][i] = max_ind
-	s = s + rev_word_index[max_ind]
-	# if (rev_word_index[max_ind] == '.'):
-	#	break
-print s
-
-emb = np.zeros(50)
-emb = np.reshape(emb,(1,emb.shape[0]))
-wordvec = model.predict([enc,emb]).flatten()
-top_k_ind = (-wordvec).argsort()[:k]
-print ''
-for i in range (0,k):
-	print rev_word_index[top_k_ind[i]],
-print ''
+ans = model.predict([enc,emb])
+for i in range (0,ans.shape[1]):
+	print 'ans[i] , argmax = ', ans[0,i], np.argmax(ans[0,i])
+	print ans[0,i].shape
+	print rev_word_index[np.argmax(ans[0,i,:])]
