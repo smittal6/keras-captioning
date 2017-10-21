@@ -23,21 +23,17 @@ class dataFeeder():
         padded_sequence = np.pad(sequence, (0,self.params['EMBEDDING_DIM'] - len(valid_sequence)%self.params['EMBEDDING_DIM']), 'constant')
         return padded_sequence
 
-    def getHotVec(self,text):
+    def getHotVec(self,word):
         '''
         Returns the many hot vector as required by output
         '''
         x = np.zeros(self.params['VOCAB_SIZE'])
-        words = text.split()
-        for word in words:
-            if (word in self.word_index):
+	if (word in self.word_index):
             	x[self.word_index[word]] = 1
         return x
 
     def sample(self):
         while 1:
-        	c = 0
-        	flag = True
         	img_list = []
         	encode_list = []
         	p1_embed_list = []
@@ -49,19 +45,20 @@ class dataFeeder():
     			L = lines[i].split("\t")
                 	img_list.append(L[0])
                 	cap = L[1].split()
-                	ind = random.randint(1,len(cap)-1)
-                	while (ind <= len(cap) - 1):
-                		p1_embed_list.append(self.getVec(' '.join(cap[:ind])))
-                		p2_hot_list.append(self.getHotVec(' '.join(cap[ind:])))
-                		encode_list.append(self.encoding[L[0]])
-                		ind = ind + 1
-                		c = c + 1;
-                		if (c == self.params['BATCH_SIZE']):
-                			flag = False; break;
-                	if (flag == False):
-                    		break;
+			encode_list.append(self.encoding[L[0]])
+			p1_embed_list.append(self.getVec(' '.join(cap)))
+			M = np.zeros((self.params['MAX_SEQUENCE_LENGTH'],self.params['VOCAB_SIZE']));
+                        # print "Shape of Target: ",M.shape
+                        caption_ind = 1
+			for ind in range(0,len(cap)-1):
+                            M[ind,:] = self.getHotVec(cap[caption_ind])
+                            caption_ind += 1
+                        # print "The One-Hot Matrix: ",M
+			p2_hot_list.append(M)
         	inputs = [np.asarray(encode_list),np.asarray(p1_embed_list)]
         	output = np.asarray(p2_hot_list)
+		# print 'input_shape = ', inputs[0].shape, inputs[1].shape
+		# print 'output_shape = ', output.shape
     		yield (inputs, output)
 
     def __init__(self, params, picklefile, modelfile=None):
