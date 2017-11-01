@@ -11,12 +11,12 @@ def train():
 	'EMBEDDING_DIM': 50,
 	'MAX_SEQUENCE_LENGTH': 50,
 	'VOCAB_SIZE': 5000,
-	'RECUR_OUTPUT_DIM': 100,
+	'RECUR_OUTPUT_DIM': 200,
 	'IMAGE_ENCODING_SIZE': 4096,
 	'PATH_TRAIN': '/data/'+str(sys.argv[1])+'/keras-captioning/files/Flickr8k_text/flickr_8k_train_dataset.txt',
 	'PICKLE_FILE': '/data/'+str(sys.argv[1])+'/keras-captioning/files/encoded_images.p',
 	'SPE': 20,
-	'EPOCHS': 25,
+	'EPOCHS': 50,
 	'BATCH_SIZE': 64,
 	'SAVE_PATH': '/data/'+str(sys.argv[1])+'/keras-captioning/files/models/'
 	}
@@ -29,10 +29,8 @@ def train():
 
 	# Get the generator from dF
 	generator = main.gen
-
 	model.compile(optimizer='rmsprop',loss='categorical_crossentropy',metrics=['accuracy'])
 	model.fit_generator(generator,verbose=2,epochs=params['EPOCHS'],steps_per_epoch=params['SPE'])
-
 	model.save(params['SAVE_PATH']+name)
 	
 
