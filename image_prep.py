@@ -7,6 +7,8 @@ from keras.preprocessing import image
 from keras.applications.vgg16 import VGG16, preprocess_input
 from keras.backend.tensorflow_backend import set_session
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
 counter = 0
 
 def load_image(path):
