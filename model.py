@@ -22,7 +22,7 @@ class main_model():
         '''
         #The trainable image model. Takes the image embedding as input
         im_model = Sequential()
-        im_model.add(Dense(params['EMBEDDING_DIM']*2, activation='relu', input_shape=(params['IMAGE_ENCODING_SIZE'],)))
+        im_model.add(Dense(1024, activation='relu', input_shape=(params['IMAGE_ENCODING_SIZE'],)))
         im_model.add(Dense(params['EMBEDDING_DIM'], activation='relu'))
         im_model.add(RepeatVector(params['MAX_SEQUENCE_LENGTH']))
         # print im_model.input.shape
@@ -35,8 +35,10 @@ class main_model():
 
         # Concatenates the image and sentence embedding
         merged_input = keras.layers.concatenate([im_model.output,lg_model.output],axis=-1)
-        recurrent_layer = GRU(params['RECUR_OUTPUT_DIM'],return_sequences=True,kernel_regularizer = regularizers.l2(),recurrent_regularizer = regularizers.l2())(merged_input)
-        output = TimeDistributed(Dense(params['VOCAB_SIZE'],activation='softmax',kernel_regularizer = regularizers.l2()))(recurrent_layer)
+        print merged_input._keras_shape
+        recurrent_layer = LSTM(params['RECUR_OUTPUT_DIM'],return_sequences=False,kernel_regularizer = regularizers.l2(),recurrent_regularizer = regularizers.l2())(merged_input)
+        # output = TimeDistributed(Dense(params['VOCAB_SIZE'],activation='softmax',kernel_regularizer = regularizers.l2()))(recurrent_layer)
+        output = Dense(params['VOCAB_SIZE'],activation='softmax',kernel_regularizer = regularizers.l2())(recurrent_layer)
 
         # Defining the functional model
         model = Model(inputs=[im_model.input,lg_model.input],outputs=output)
