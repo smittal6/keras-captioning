@@ -8,6 +8,8 @@ from keras.preprocessing.sequence import pad_sequences
 from keras.models import Model, Sequential
 from keras.layers import Embedding
 from keras.models import load_model
+from nltk import FreqDist
+from nltk.tokenize import word_tokenize
 
 class dataFeeder():
 
@@ -15,12 +17,12 @@ class dataFeeder():
         '''
         Returns the embedding for the sentence.
         '''
-        sequence = [item for sublist in self.tokenizer.texts_to_sequences(text.split()) for item in sublist]
-        valid_sequence = []
-        for s in sequence:
-        	if (s < self.params['VOCAB_SIZE']):
-        		valid_sequence.append(s)
-        padded_sequence = np.pad(sequence, (0,self.params['EMBEDDING_DIM'] - len(valid_sequence)%self.params['EMBEDDING_DIM']), 'constant')
+        text = text.lower()
+        words = text.split()
+        sequence = []
+        for word in words:
+        	sequence.append(self.word_index[word])
+        padded_sequence = np.pad(sequence, (0,self.params['EMBEDDING_DIM'] - len(sequence)%self.params['EMBEDDING_DIM']), 'constant')
         return padded_sequence
 
     def getHotVec(self,word):
@@ -28,8 +30,8 @@ class dataFeeder():
         Returns the many hot vector as required by output
         '''
         x = np.zeros(self.params['VOCAB_SIZE'])
-	if (word in self.word_index):
-            	x[self.word_index[word]] = 1
+        if (word in self.word_index):
+        	x[self.word_index[word]] = 1
         return x
 
     def sample(self):
@@ -45,20 +47,18 @@ class dataFeeder():
     			L = lines[i].split("\t")
                 	img_list.append(L[0])
                 	cap = L[1].split()
+			print cap
+			i_rand = np.random.randint(low=1,high=len(cap)-1)
+			p1 = cap[0:i_rand]
 			encode_list.append(self.encoding[L[0]])
-			p1_embed_list.append(self.getVec(' '.join(cap)))
-			M = np.zeros((self.params['MAX_SEQUENCE_LENGTH'],self.params['VOCAB_SIZE']));
-                        # print "Shape of Target: ",M.shape
-                        caption_ind = 1
-			for ind in range(0,len(cap)-1):
-                            M[ind,:] = self.getHotVec(cap[caption_ind])
-                            caption_ind += 1
-                        # print "The One-Hot Matrix: ",M
-			p2_hot_list.append(M)
+			p1_embed_list.append(self.getVec(' '.join(p1)))
+			# M = np.zeros((self.params['MAX_SEQUENCE_LENGTH'],self.params['VOCAB_SIZE']));
+			# for ind in range(0,len(cap)-1):
+			#	M[ind,:] = self.getHotVec(cap[ind+1])
+			p2 = self.getHotVec(cap[i_rand+1])
+			p2_hot_list.append(p2)
         	inputs = [np.asarray(encode_list),np.asarray(p1_embed_list)]
         	output = np.asarray(p2_hot_list)
-		# print 'input_shape = ', inputs[0].shape, inputs[1].shape
-		# print 'output_shape = ', output.shape
     		yield (inputs, output)
 
     def __init__(self, params, picklefile, modelfile=None):
@@ -66,19 +66,25 @@ class dataFeeder():
         with open(params['PATH_TRAIN']) as inf:
             for line in inf:
                 temp = line.replace("\n","")
-                texts.append(temp[temp.index('\t')+1:])
+                texts.append(temp[temp.index('\t')+1:].lower())
 
-        tokenizer = Tokenizer(num_words = params['VOCAB_SIZE'], filters='!"$%&()*+,-/:;<=>?@[\\]^_`{|}~\n')
-        tokenizer.fit_on_texts(texts)
-        sequences = tokenizer.texts_to_sequences(texts)
-        z = tokenizer.word_index
-        word_index = {}
-        for word in z:
-        	if (z[word] < params['VOCAB_SIZE']):
-        		word_index[word] = z[word]
-        pickle.dump(word_index, open("word_pickle.p", "wb" ))
+        word_dist = FreqDist()
+        for s in texts:
+        	word_dist.update(s.split())
+    	word_freq = dict(word_dist)
+    	word_index = {}
+    	c = 1
+    	for t in word_freq:
+    		word_index[t] = c
+    		c = c + 1
+        pickle.dump(word_index, open("word_pickle.p", "wb"))
+        
+        word_prob = {}
+        for t in word_freq:
+        	word_prob[t] = 1/word_freq[t]
+        pickle.dump(word_index, open("word_freq.p", "wb"))
 
-        self.tokenizer = tokenizer
+        self.word_freq = word_freq
         self.word_index = word_index
 
         embeddings_index = {}
@@ -90,6 +96,7 @@ class dataFeeder():
             embeddings_index[word] = coefs
         f.close()
         # Obtained all the word embeddings. Fetch for word 'w', as embeddings_index[w]
+
 
         embedding_matrix = np.zeros((params['VOCAB_SIZE'] + 1, params['EMBEDDING_DIM']))
         for word, i in word_index.items():
@@ -112,4 +119,5 @@ class dataFeeder():
             self.model.add(embedding_layer)
         else:
             self.model = load_model(modelfile);
+
 
