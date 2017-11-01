@@ -49,9 +49,9 @@ class dataFeeder():
                 	cap = L[1].split()
 			print cap
 			i_rand = np.random.randint(low=1,high=len(cap)-1)
-			cap_p1 = cap[0:i_rand]
+			p1 = cap[0:i_rand]
 			encode_list.append(self.encoding[L[0]])
-			p1_embed_list.append(self.getVec(' '.join(cap_p1)))
+			p1_embed_list.append(self.getVec(' '.join(p1)))
 			# M = np.zeros((self.params['MAX_SEQUENCE_LENGTH'],self.params['VOCAB_SIZE']));
 			# for ind in range(0,len(cap)-1):
 			#	M[ind,:] = self.getHotVec(cap[ind+1])
