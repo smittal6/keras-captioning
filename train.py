@@ -10,14 +10,14 @@ def train():
 	params={
 	'GLOVE_DIR': '/data/'+str(sys.argv[1])+'/keras-captioning/files/GLOVE',
 	'EMBEDDING_DIM': 50,
-	'MAX_SEQUENCE_LENGTH': 50,
+	'MAX_SEQUENCE_LENGTH': 15,
 	'VOCAB_SIZE': 7705,
-	'RECUR_OUTPUT_DIM': 100,
+	'RECUR_OUTPUT_DIM': 512,
 	'IMAGE_ENCODING_SIZE': 4096,
 	'PATH_TRAIN': '/data/'+str(sys.argv[1])+'/keras-captioning/files/Flickr8k_text/flickr_8k_train_dataset.txt',
 	'PICKLE_FILE': '/data/'+str(sys.argv[1])+'/keras-captioning/files/encoded_images.p',
 	'SPE': 20,
-	'EPOCHS': 50,
+	'EPOCHS': 20,
 	'BATCH_SIZE': 64,
 	'SAVE_PATH': '/data/'+str(sys.argv[1])+'/keras-captioning/files/models/'
 	}

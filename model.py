@@ -35,7 +35,7 @@ class main_model():
 
         # Concatenates the image and sentence embedding
         merged_input = keras.layers.concatenate([im_model.output,lg_model.output],axis=-1)
-        print merged_input._keras_shape
+        # print merged_input._keras_shape
         recurrent_layer = LSTM(params['RECUR_OUTPUT_DIM'],return_sequences=False,kernel_regularizer = regularizers.l2(),recurrent_regularizer = regularizers.l2())(merged_input)
         # output = TimeDistributed(Dense(params['VOCAB_SIZE'],activation='softmax',kernel_regularizer = regularizers.l2()))(recurrent_layer)
         output = Dense(params['VOCAB_SIZE'],activation='softmax',kernel_regularizer = regularizers.l2())(recurrent_layer)

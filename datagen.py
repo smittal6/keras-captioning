@@ -1,6 +1,7 @@
 import os
 import time
 import numpy as np
+# import _pickle as pickle
 import cPickle as pickle
 import random
 from keras.preprocessing.text import Tokenizer
@@ -21,7 +22,7 @@ class dataFeeder():
         words = text.split()
         sequence = []
         for word in words:
-        	sequence.append(self.word_index[word])
+                sequence.append(self.word_index[word])
         padded_sequence = np.pad(sequence, (0,self.params['EMBEDDING_DIM'] - len(sequence)%self.params['EMBEDDING_DIM']), 'constant')
         return padded_sequence
 
@@ -31,35 +32,35 @@ class dataFeeder():
         '''
         x = np.zeros(self.params['VOCAB_SIZE'])
         if (word in self.word_index):
-        	x[self.word_index[word]] = 1
+                x[self.word_index[word]] = 1
         return x
 
     def sample(self):
         while 1:
-        	img_list = []
-        	encode_list = []
-        	p1_embed_list = []
-        	p2_hot_list = []
-        	with open(self.params['PATH_TRAIN']) as f:
-        		lines = random.sample(f.readlines(),self.params['BATCH_SIZE'])
-    		for i,line in enumerate(lines):
-    			lines[i] = lines[i].replace("\n","")
-    			L = lines[i].split("\t")
-                	img_list.append(L[0])
-                	cap = L[1].split()
-			print cap
-			i_rand = np.random.randint(low=1,high=len(cap)-1)
-			p1 = cap[0:i_rand]
-			encode_list.append(self.encoding[L[0]])
-			p1_embed_list.append(self.getVec(' '.join(p1)))
-			# M = np.zeros((self.params['MAX_SEQUENCE_LENGTH'],self.params['VOCAB_SIZE']));
-			# for ind in range(0,len(cap)-1):
-			#	M[ind,:] = self.getHotVec(cap[ind+1])
-			p2 = self.getHotVec(cap[i_rand+1])
-			p2_hot_list.append(p2)
-        	inputs = [np.asarray(encode_list),np.asarray(p1_embed_list)]
-        	output = np.asarray(p2_hot_list)
-    		yield (inputs, output)
+            img_list = []
+            encode_list = []
+            p1_embed_list = []
+            p2_hot_list = []
+            with open(self.params['PATH_TRAIN']) as f:
+                lines = random.sample(f.readlines(),self.params['BATCH_SIZE'])
+            for i,line in enumerate(lines):
+                lines[i] = lines[i].replace("\n","")
+                L = lines[i].split("\t")
+                img_list.append(L[0])
+                cap = L[1].split()
+                print(cap)
+                i_rand = np.random.randint(low=1,high=len(cap)-1)
+                p1 = cap[0:i_rand]
+                encode_list.append(self.encoding[L[0]])
+                p1_embed_list.append(self.getVec(' '.join(p1)))
+                # M = np.zeros((self.params['MAX_SEQUENCE_LENGTH'],self.params['VOCAB_SIZE']));
+                # for ind in range(0,len(cap)-1):
+                #       M[ind,:] = self.getHotVec(cap[ind+1])
+                p2 = self.getHotVec(cap[i_rand+1])
+                p2_hot_list.append(p2)
+            inputs = [np.asarray(encode_list),np.asarray(p1_embed_list)]
+            output = np.asarray(p2_hot_list)
+            yield (inputs, output)
 
     def __init__(self, params, picklefile, modelfile=None):
         texts = []
@@ -70,18 +71,19 @@ class dataFeeder():
 
         word_dist = FreqDist()
         for s in texts:
-        	word_dist.update(s.split())
-    	word_freq = dict(word_dist)
-    	word_index = {}
-    	c = 1
-    	for t in word_freq:
-    		word_index[t] = c
-    		c = c + 1
+            word_dist.update(s.split())
+
+        word_freq = dict(word_dist)
+        word_index = {}
+        c = 1
+        for t in word_freq:
+            word_index[t] = c
+            c = c + 1
         pickle.dump(word_index, open("word_pickle.p", "wb"))
         
         word_prob = {}
         for t in word_freq:
-        	word_prob[t] = 1/word_freq[t]
+            word_prob[t] = 1/word_freq[t]
         pickle.dump(word_index, open("word_freq.p", "wb"))
 
         self.word_freq = word_freq
@@ -100,11 +102,11 @@ class dataFeeder():
 
         embedding_matrix = np.zeros((params['VOCAB_SIZE'] + 1, params['EMBEDDING_DIM']))
         for word, i in word_index.items():
-        	if (i < params['VOCAB_SIZE']):
-	            embedding_vector = embeddings_index.get(word)
-	            if embedding_vector is not None:
-	                # words not found in embedding index will be all-zeros.
-	                embedding_matrix[i] = embedding_vector
+            if (i < params['VOCAB_SIZE']):
+                embedding_vector = embeddings_index.get(word)
+                if embedding_vector is not None:
+                    # words not found in embedding index will be all-zeros.
+                    embedding_matrix[i] = embedding_vector
         #Found the intersection of GLOVE, and Captions
 
         # Initializing the class params like model, encoding_dict 
@@ -119,5 +121,3 @@ class dataFeeder():
             self.model.add(embedding_layer)
         else:
             self.model = load_model(modelfile);
-
-
