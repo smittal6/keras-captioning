@@ -22,7 +22,7 @@ class main_model():
         '''
         #The trainable image model. Takes the image embedding as input
         im_model = Sequential()
-        im_model.add(Dense(1024, activation='relu', input_shape=(params['IMAGE_ENCODING_SIZE'],)))
+        im_model.add(Dense(params['EMBEDDING_DIM']*2, activation='relu', input_shape=(params['IMAGE_ENCODING_SIZE'],)))
         im_model.add(Dense(params['EMBEDDING_DIM'], activation='relu'))
         im_model.add(RepeatVector(params['MAX_SEQUENCE_LENGTH']))
         # print im_model.input.shape
