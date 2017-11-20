@@ -1,6 +1,6 @@
 import os
 import sys
-import cPickle as pickle
+import _pickle as pickle
 import numpy as np
 import tensorflow as tf
 from keras.preprocessing import image
@@ -41,32 +41,18 @@ encoding_model = get_model()
 enc = get_encoding(encoding_model,path)
 word_index = pickle.load(open('word_pickle.p','rb'))
 word_freq = pickle.load(open('word_freq.p','rb'))
-rev_word_index = {v: k for k, v in word_index.iteritems()}
+rev_word_index = {v: k for k, v in word_index.items()}
 
-emb = np.zeros(50)
+# emb = np.zeros(50)
 
-model = load_model(os.getcwd()+'/files/models/testing.h5')
+
+model = load_model(os.getcwd()+'/files/models/learn_embed.hd5')
 enc = np.reshape(enc,(1,enc.shape[0]))
-emb = np.reshape(emb,(1,emb.shape[0]))
-emb[0][0] = word_index['#']; emb[0][1] = word_index['a'];
-rev_word_index[0] = 'vv'
+emb = np.zeros((20, 7706)); emb[0][word_index['#']] = 1;
+emb = np.expand_dims(emb, axis=0)
+print (emb.shape)
+M = model.predict([enc,emb])
 
-word_prob = {}
-s = 0
-m = 0
-for t in word_freq:
-	s += word_freq[t]
-for t in word_freq:
-	word_prob[t] = s/float(word_freq[t])
-	if (word_prob[t] > m):
-		m = word_prob[t]
-# for t in word_prob:
-# 	word_prob[t] = word_prob[t]/float(m)*1000
-print word_prob['.']
-print word_prob['sash']
-
-ans = model.predict([enc,emb])
-# for i in range (0,ans.shape[1]):
-	#print 'ans[i] , argmax = ', ans[0,i], np.argmax(ans[0,i])
-	# print ans[0,i].shape
-	# print rev_word_index[np.argmax(ans[0,i,:])],
+for i in range (1,20):
+	a = np.argmax(M[0][i])
+	print (rev_word_index[a],)

@@ -1,6 +1,6 @@
 import os
 import sys
-import cPickle as pickle
+import _pickle as pickle
 import numpy as np
 import tensorflow as tf
 from keras.preprocessing import image
@@ -25,17 +25,16 @@ def get_model():
 def get_encoding(model, img):
 	global counter
 	counter += 1
-	image = load_image(os.getcwd()+'/Flickr8k_Dataset/Flickr8k_Dataset/'+str(img))
+	image = load_image(os.getcwd()+'/files/Flickr8k_Dataset/Flickr8k_Dataset/'+str(img))
 	pred = model.predict(image)
 	pred = np.reshape(pred, pred.shape[1])
-	print "Encoding image: "+str(counter)
-	print pred.shape
+	print ("Encoding image: "+str(counter), pred.shape)
 	return pred
 
 def prepare_dataset():
 	encoded_images = {}
 	encoding_model = get_model()
-	with open(os.getcwd()+'/Flickr8k_text/Flickr8k.token.txt') as inf:
+	with open(os.getcwd()+'/files/Flickr8k_text/Flickr8k.token.txt') as inf:
 		for line in inf:
 			img = line[0:line.index('#')]
 			encoded_images[img] = get_encoding(encoding_model, img)
